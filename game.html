@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <p class='guesses'></p>
+  <p class='lastResult'></p>
+  <p class='lowOrHi'></p>
+  <label for='guessField'>Enter a guess:</label>
+  <input type='text' id='guessField' class='guessField'>
+  <input type='submit' value='Submit guess' class='guessSubmit'>
+
+
+</body>
+
+<script>
+var randomNumber = Math.floor(Math.random() * 100)+1;
+
+var guesses = document.querySelector('.guesses');
+var lastResult = document.querySelector('.lastResult');
+var lowOrHi=document.querySelector('.lowOrHi');
+
+var guessSubmit = document.querySelector('.guessSubmit');
+var guessField = document.querySelector('.guessField');
+
+var guessCount = 1;
+var resetButton;
+
+guessField.focus();
+//这一行使用focus() 方法立即自动地放置文本光标在输入框内，当页面加载完成时，意味着用户可以马上开始他们的第一次游戏，而不需要去点击输入框。 这只是一个小的附加，但它提高了可用性 —— 给用户提供了可视化的线索去告诉他们该怎么开始这个游戏。
+function checkGuess(){
+  //第一行（上面的第2行）声明了一个名为userGuess的变量，并将其值设置为在文本字段中输入的当前值。 我们还通过内置的Number()方法运行这个值，只是为了确保该值绝对是一个数字。
+  var userGuess = Number(guessField.value);
+  if (guessCount === 1){
+    guesses.textContent = 'Previous guesses: '
+  }
+  //条件代码块允许您根据某个条件是否为真从而选择性地运行代码。 它看起来有点像一个函数，但它不是。 条件块的最简单形式是从关键字if开始，然后是一些括号，然后是一些花括号。 在括号内，我们包含了一个比较。 如果比较返回true，就会执行放在花括号中的代码。 反之，花括号中的代码就会被跳过，从而执行下一行代码。 在这种情况下，比较是测试guessCount变量是否等于1，即玩家是不是第一次猜数字：
+guesses.textContent += userGuess + ' ';
+
+if(userGuess === randomNumber) {
+  lastResult.textContent = 'Congratulations!';
+  lastResult.style.backgroundColor = 'green';
+  lastResult.style.display = 'inline-block';
+  lowOrHi.textContent= '';
+  setGameOver();
+
+}else if (guessCount === 10){
+  lastResult.textContent = '!over';
+  setGameOver;
+}else{
+  lastResult.textContent = 'wrong!';
+  lastResult.style.backgroundColor = 'red';
+  lastResult.style.display = 'inline-block';
+  if(userGuess < randomNumber){
+    lowOrHi.textContent = 'it was too low!';
+    } else if(userGuess > randomNumber){
+      lowOrHi.textContent = 'it was too high!';
+    }
+}
+  //第一个if(){ } 检查用户的猜测是否等于在代码顶端设置的randomNumber值。如果是，则玩家猜对了，游戏胜利，我们将向玩家显示一个漂亮的绿色的祝贺信息，并清除猜测信息框的内容，调用setgameover()方法。
+  //紧接着我们又写了一个else if(){ } 结构。它会检查这个回合是否是玩家的最后一个回合。如果是，程序将做与前一个程序块相同的事情，除了它显示的是game over而不是祝贺消息。
+//最后的一个块是else { }，其中包含着前面两个比较都为false才会执行的代码，即玩家还有游戏的次数但是本次没猜对。在这个情况下，我们会告诉玩家他们猜错了，并执行一个条件测试，判断并告诉玩家猜测的数字是大是小。
+
+guessCount++;
+guessField.value = '';
+guessField.focus();
+//这个函数最后三行 （上面的第26–28行） 让我们为下次猜测值提交做好准备。我们把guessCount变量的值+1，因此玩家消耗了一次机会 （++是一个递增操作符 — 将值+1），然后我们把文本段的值清空，重新将焦点设置在文本段里，准备下一轮游戏
+
+}
+// 事件是浏览器中发生的动作，例如点击按钮，加载页面或播放视频，我们可以调用代码来响应。 侦听事件发生的构造方法称为事件监听器，响应事件触发而运行的代码块被称为事件处理器。
+guessSubmit.addEventListener('click', checkGuess);
+
+function setGameOver() {
+  guessField.disabled = true;
+  guessSubmit.disabled = true;
+
+  //前两行禁用表单文本输入和按钮，方法是将其disable属性设置为true。 这是有必要的，如果我们没有禁用，用户可以在游戏结束后提交更多的猜测，这会破坏游戏的规则。
+
+  resetButton = document.createElement('button');
+  resetButton.textContent = 'start new game';
+  document.body.appendChild(resetButton);
+  //接下来的三行创建了一个新的button元素，设置它的文本为“Start new game”，并把它添加到我们文档的底部。
+
+  resetButton.addEventListener('click', resetGame);
+}
+//最后一行在我们的新按钮上设置了一个事件监听器，当它被点击时，一个名为resetGame()的函数被将被调用。
+
+
+
+function resetGame(){
+  guessCount =1;
+
+  var resetParas = document.querySelectorAll('.resultPara p');
+  for (var i=0; i<resetParas.length; i++){
+    resetParas[i].textContent = '';
+  }
+  resetButton.parentNode.removeChild(resetButton);
+
+  //guessField.disabled = false;
+  guessSubmit.disabled = false;
+  guessField.value = '';
+  guessField.focus();
+
+  lastResult.style.backgroundColor = 'white';
+
+  randomNumber = Math.floor(Math.random()* 100)+1;
+}
+//将guessCount重置为1。
+//清除所有信息段落。
+//从我们的代码中删除重置按钮。
+//启用表单元素，并清空和聚焦文本字段，准备接受用户输入的新猜测。
+//从lastResult段中删除背景颜色。
+//生成一个新的随机数，这样下次您就是在猜测新的数字了！
+</script>
+
+</html>
