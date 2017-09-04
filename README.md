@@ -1,2 +1,0 @@
-# yoyo
-first git project
